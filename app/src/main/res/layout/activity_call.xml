@@ -1,0 +1,24 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <org.webrtc.SurfaceViewRenderer
+        android:id="@+id/remoteView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <org.webrtc.SurfaceViewRenderer
+        android:id="@+id/localView"
+        android:layout_width="120dp"
+        android:layout_height="160dp"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="12dp" />
+
+    <ImageButton
+        android:id="@+id/btnHangup"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="24dp"
+        android:background="@android:color/holo_red_dark"
+        android:contentDescription="Hang up" />
+</FrameLayout>
