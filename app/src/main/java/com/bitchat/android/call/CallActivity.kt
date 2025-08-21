@@ -8,7 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import org.webrtc.*
-
+import org.json.JSONObject
 import java.util.UUID
 
 class CallActivity : ComponentActivity() {
@@ -57,7 +57,10 @@ class CallActivity : ComponentActivity() {
         tracks = webrtc.startLocalMedia(localView)
         pc = webrtc.createPeerConnection(object : PeerConnection.Observer {
             override fun onIceCandidate(c: IceCandidate) {
-                send(SignalType.CANDIDATE, """{"mid":"${c.sdpMid}","mLine":${c.sdpMLineIndex},"cand":"${c.sdp}"}""")
+                send(
+                    SignalType.CANDIDATE,
+                    """{"mid":"${c.sdpMid}","mLine":${c.sdpMLineIndex},"cand":"${c.sdp}"}"""
+                )
             }
             override fun onTrack(transceiver: RtpTransceiver?) {}
             override fun onAddStream(stream: MediaStream?) {}
@@ -85,7 +88,10 @@ class CallActivity : ComponentActivity() {
     }
 
     private fun onRemoteOffer(sdp: String) {
-        pc!!.setRemoteDescription(SdpObserverAdapter(), SessionDescription(SessionDescription.Type.OFFER, sdp))
+        pc!!.setRemoteDescription(
+            SdpObserverAdapter(),
+            SessionDescription(SessionDescription.Type.OFFER, sdp)
+        )
         pc!!.createAnswer(object : SdpObserverAdapter() {
             override fun onCreateSuccess(answer: SessionDescription) {
                 pc!!.setLocalDescription(this, answer)
@@ -95,4 +101,40 @@ class CallActivity : ComponentActivity() {
     }
 
     private fun onRemoteAnswer(sdp: String) {
-        pc!!.setRemoteDescription(SdpObserverAdapter(), SessionDescription(SessionDescription.Type
+        pc!!.setRemoteDescription(
+            SdpObserverAdapter(),
+            SessionDescription(SessionDescription.Type.ANSWER, sdp)
+        )
+
+        // Make sure remote renderer is still ready for inbound media
+        if (!remoteView.isInitialized) {
+            remoteView.init(EglBase.create().eglBaseContext, null)
+        }
+    }
+
+    private fun onRemoteCandidate(json: String) {
+        val obj = JSONObject(json)
+        val candidate = IceCandidate(
+            obj.getString("mid"),
+            obj.getInt("mLine"),
+            obj.getString("cand")
+        )
+        pc?.addIceCandidate(candidate)
+    }
+
+    private fun finishCall() {
+        tracks.dispose()
+        pc?.close()
+        webrtc.dispose()
+        finish()
+    }
+
+    private fun hasPermissions(): Boolean =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
+        ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+
+    private fun send(type: SignalType, payload: String) {
+        val msg = SignalingCodec.encode(callId, type, payload.toByteArray())
+        transport.send(callId, msg)
+    }
+}
