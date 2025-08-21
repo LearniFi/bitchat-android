@@ -23,9 +23,7 @@ android {
     }
 
     dependenciesInfo {
-        // Disables dependency metadata when building APKs.
         includeInApk = false
-        // Disables dependency metadata when building Android App Bundles.
         includeInBundle = false
     }
 
@@ -94,10 +92,10 @@ dependencies {
 
     // Security preferences
     implementation(libs.androidx.security.crypto)
-    
-    // Testing
-    testImplementation(libs.bundles.testing)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.bundles.compose.testing)
-    debugImplementation(libs.androidx.compose.ui.tooling)
+
+    // --- Added for P2P calls over BitChat signaling ---
+    // Google WebRTC native library
+    implementation("org.webrtc:google-webrtc:1.0.+")
+    // JSON util for signaling payloads (optional – replace with CBOR if preferred)
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
 }
