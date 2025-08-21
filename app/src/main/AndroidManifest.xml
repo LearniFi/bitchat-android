@@ -26,6 +26,19 @@
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
     <uses-feature android:name="android.hardware.bluetooth" android:required="true" />
 
+    <!-- WebRTC / P2P call permissions -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Wi‑Fi Direct / LAN discovery for offline IP transport -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- Android 13+ nearby devices for peer discovery -->
+    <uses-permission
+        android:name="android.permission.NEARBY_WIFI_DEVICES"
+        android:required="false" />
+
     <application
         android:name=".BitchatApplication"
         android:allowBackup="false"
@@ -37,6 +50,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BitchatAndroid"
         tools:targetApi="31">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -50,5 +64,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- CallActivity for testing WebRTC loopback / BitChat signaling -->
+        <activity
+            android:name=".call.CallActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:label="Call Test"
+            android:theme="@style/Theme.BitchatAndroid" />
     </application>
 </manifest>
